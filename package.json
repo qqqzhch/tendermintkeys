@@ -9,7 +9,8 @@
   "dependencies": {
     "bip39": "2.5.0",
     "ed25519": "0.0.4",
-    "ripemd160": "2.0.2"
+    "ripemd160": "2.0.2",
+    "tweetnacl": "^1.0.0"
   },
   "keywords": [
     "Ed25519",

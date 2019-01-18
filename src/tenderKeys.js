@@ -2,7 +2,8 @@
 
 var crypto    = require("crypto");
 var bip39     = require("bip39");
-var ed25519   = require("ed25519");
+// var ed25519   = require("ed25519");
+var ed25519   = require("tweetnacl");
 var RIPEMD160 = require("ripemd160");
 
 const TYPE_ED25519      = '01';
@@ -18,15 +19,32 @@ const SEED_NAME         =  'Seed';
 const PRIVKEY_NAME      = 'PrivateKey';
 const ADDRESS_NAME      = 'Address';
 
+var  crypto_sign_PUBLICKEYBYTES = 32;
+var  crypto_sign_SECRETKEYBYTES = 64;
+
+function ed25519keypar(seed){
+  console.log('seed',seed)
+  var pk = new Uint8Array(crypto_sign_PUBLICKEYBYTES);
+  var sk = new Uint8Array(crypto_sign_SECRETKEYBYTES);
+
+  for (var  i = 0; i < 32; i++){
+    sk[i] = seed[i];
+  }
+      
+  // crypto_sign_keypair(publicKeyData, privateKeyData);
+  ed25519.lowlevel.crypto_sign_keypair(pk, sk,true);
+  return {publicKey: pk, secretKey: sk};
+
+}
 
 module.exports = class TenderKeys {
       
       generateKeyPair(seed){
         this._isHexString(seed,SEED_NAME,SEED_LENGTH);
         let buffer = new Buffer(seed, "hex")
-        let keyPair = ed25519.MakeKeypair(buffer);
-        return {publicKey:keyPair.publicKey.toString('hex').toUpperCase(),
-                privateKey:keyPair.privateKey.toString("hex").toUpperCase()};
+        let keyPair = ed25519keypar(buffer);
+        return {publicKey:Buffer.from(keyPair.publicKey) ,
+                privateKey:Buffer.from(keyPair.secretKey)};
       }
       
       generateRandomMnemonic(){
@@ -84,9 +102,9 @@ module.exports = class TenderKeys {
       sign(privKeyStr, txStr){
         let buffer  = new Buffer(txStr);
         let privKey = new Buffer(privKeyStr,"hex");
-        let signature = ed25519.Sign(buffer,privKey);        
+        let signature = Buffer.from(ed25519.sign(buffer,privKey));        
 
-        return signature.toString("hex");
+        return signature;
       }
       
       _isHexString(hexString,name,length){
