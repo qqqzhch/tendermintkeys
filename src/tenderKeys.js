@@ -62,11 +62,12 @@ module.exports = class TenderKeys {
       }
       
       getAddressFromPubKey(publicKey){
+
         this._isHexString(publicKey,PUBKEY_NAME,PUBKEY_LENGTH);
-        let ripmd160 = new RIPEMD160();
-        let encodedPubKey = this._hexStringToBytes(TYPE_ED25519 + PUBKEY_PREFIX + publicKey);
-        var buffer = new Buffer(encodedPubKey);
-        return ripmd160.update(buffer).digest('hex').toUpperCase();
+        let hash = crypto.createHash('sha256');
+        hash.update(Buffer.from(publicKey,'hex') );
+        var address=hash.digest().slice(0,20).toString('hex').toUpperCase()
+        return address;
       }
 
       getAddressFromPrivKey(privateKey){
@@ -101,6 +102,13 @@ module.exports = class TenderKeys {
 
       sign(privKeyStr, txStr){
         let buffer  = new Buffer(txStr);
+        let privKey = new Buffer(privKeyStr,"hex");
+        let signature = Buffer.from(ed25519.sign(buffer,privKey));        
+
+        return signature;
+      }
+      signBuffer(privKeyStr, txStrBuffer){
+        let buffer  = txStrBuffer;
         let privKey = new Buffer(privKeyStr,"hex");
         let signature = Buffer.from(ed25519.sign(buffer,privKey));        
 
