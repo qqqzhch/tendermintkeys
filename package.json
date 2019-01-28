@@ -1,6 +1,6 @@
 {
   "name": "tendermintelectronkey",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A module for creating bip39 mnemonic, ed25519 key pair and ripemd160 address for Tendermint and Hyperledger Burrow",
   "main": "index.js",
   "scripts": {

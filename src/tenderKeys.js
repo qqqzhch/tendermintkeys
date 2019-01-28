@@ -105,14 +105,14 @@ module.exports = class TenderKeys {
         let privKey = new Buffer(privKeyStr,"hex");
         let signature = Buffer.from(ed25519.sign(buffer,privKey));        
 
-        return signature;
+        return signature.slice(0,64);
       }
       signBuffer(privKeyStr, txStrBuffer){
         let buffer  = txStrBuffer;
         let privKey = new Buffer(privKeyStr,"hex");
         let signature = Buffer.from(ed25519.sign(buffer,privKey));        
 
-        return signature;
+        return signature.slice(0,64);
       }
       
       _isHexString(hexString,name,length){
